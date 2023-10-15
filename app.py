@@ -2,6 +2,7 @@ import streamlit as st
 import pandas as pd
 import pickle
 import numpy as np
+import re
 
 
 def recommend(book_name):
@@ -37,11 +38,23 @@ if __name__=="__main__":
             st.text("Apologies, we could not find \"{user_input}\" in our system")
         else:
             st.subheader("For you")
-            col1, col2, col3 = st.columns(3)
-            for book in recommendations:
-                with col1:
-                    st.image(book[2], caption=book[0])
-                with col2:
-                    st.write(book[0])
-                with col3:
-                    st.write(book[1])
+            
+            n_books = len(recommendations)
+            n_cols = 3
+            n_rows = int((1 + n_books // n_cols) * 3)
+            rows = [st.columns(n_cols) for _ in range(n_rows)]
+            cols = [column for row in rows for column in row]
+
+            columns_order = []
+            for i in range(0, len(recommendations), 3):
+                for j in range(3):
+                    columns_order.append(recommendations[i][j])
+                    columns_order.append(recommendations[i+1][j]) if i+1 < len(recommendations) else columns_order.append('')
+                    columns_order.append(recommendations[i+2][j]) if i+2 < len(recommendations) else columns_order.append('')
+            
+            for col, item in zip(cols, columns_order):
+                if re.match(r'https?://\S+', item) is not None:
+                    # col.text(item)
+                    col.image(item, use_column_width="always")
+                else:
+                    col.text(item)
