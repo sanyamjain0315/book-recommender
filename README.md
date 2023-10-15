@@ -1,3 +1,3 @@
 # Book recommendation system
 
-This is a collaborative recommendation system.
+This is a book recommendation system.
